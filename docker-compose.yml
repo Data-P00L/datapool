@@ -1,0 +1,87 @@
+# ==============================================================================
+# DattaPool Local Development Stack (Docker Compose)
+#
+# WARNING: REGTEST ONLY — DEVELOPMENT ONLY — NOT FOR PRODUCTION
+# The credentials below (e.g., rpcuser=admin, rpcpassword=password) are strictly
+# deterministic placeholders for local Bitcoin regtest/LND/tapd development.
+# None of these credentials should be reused outside local development.
+# ==============================================================================
+
+services:
+  bitcoind:
+    image: polarlightning/bitcoind:26.0
+    container_name: bitcoind
+    command:
+      - -regtest=1
+      - -server=1
+      - -rpcuser=admin
+      - -rpcpassword=password
+      - -txindex=1
+      - -zmqpubrawblock=tcp://0.0.0.0:28332
+      - -zmqpubrawtx=tcp://0.0.0.0:28333
+      - -fallbackfee=0.0002
+      - -rpcallowip=0.0.0.0/0
+      - -rpcbind=0.0.0.0
+    ports:
+      - "18443:18443"
+      - "28332:28332"
+      - "28333:28333"
+    volumes:
+      - bitcoin_data:/home/bitcoin/.bitcoin
+
+  lnd:
+    image: lightninglabs/lnd:v0.19.0-beta
+    container_name: lnd
+    depends_on:
+      - bitcoind
+    command:
+      - --noseedbackup
+      - --trickledelay=5000
+      - --alias=lnd-datta
+      - --listen=0.0.0.0:9735
+      - --rpclisten=0.0.0.0:10009
+      - --restlisten=0.0.0.0:8080
+      - --bitcoin.active
+      - --bitcoin.regtest
+      - --bitcoin.node=bitcoind
+      - --bitcoind.rpchost=bitcoind:18443
+      - --bitcoind.rpcuser=admin
+      - --bitcoind.rpcpass=password
+      - --tlsextradomain=lnd
+      - --bitcoind.zmqpubrawblock=tcp://bitcoind:28332
+      - --bitcoind.zmqpubrawtx=tcp://bitcoind:28333
+      - --protocol.custom-message=51
+      - --protocol.custom-nodeann=39
+      - --protocol.custom-init=39
+    ports:
+      - "10009:10009"
+      - "8081:8080"
+    volumes:
+      - lnd_data:/root/.lnd
+
+  tapd:
+    image: lightninglabs/taproot-assets:v0.7.2
+    container_name: tapd
+    depends_on:
+      - lnd
+    command:
+      - --network=regtest
+      - --debuglevel=debug
+      - --rpclisten=0.0.0.0:10029
+      - --restlisten=0.0.0.0:8089
+      - --lnd.host=lnd:10009
+      - --lnd.macaroonpath=/root/.lnd/data/chain/bitcoin/regtest/admin.macaroon
+      - --lnd.tlspath=/root/.lnd/tls.cert
+      - --allow-public-uni-proof-courier
+      - --allow-public-stats
+    ports:
+      - "10029:10029"
+      - "8089:8089"
+    volumes:
+      - tapd_data:/root/.tapd
+      - lnd_data:/root/.lnd:ro
+
+volumes:
+  bitcoin_data:
+  lnd_data:
+  tapd_data:

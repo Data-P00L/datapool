@@ -1,0 +1,34 @@
+{
+  "test": "first_real_datapool_remuneration",
+  "network": "bitcoin_signet",
+  "capture_id": "204b29142e6f3330791c2b53a90b55e2",
+  "video_sha256": "d3ba7e4842149be888da5219593aef178b419057b8999025944cae8053fe4561",
+  "manifest_sha256": "dc4daa8b113fa23f773581bed4296bca5279792fd8000c27e89c323e3351a907",
+  "asset": {
+    "ticker": "DTTA",
+    "display_symbol": "₿DATA",
+    "asset_id": "dad8452d415e5121d9b6aaf873611ada35f29f722abe8b451918e851b8c18080"
+  },
+  "reward": {
+    "amount_atomic": 25000,
+    "amount_display": "25.000"
+  },
+  "transfer": {
+    "method": "taproot_asset_onchain",
+    "txid": "3458bfc783578e87764150e7905ca24d3a13012a5c8d6e7f077d2add0749e4a4",
+    "status": "broadcast"
+  },
+  "recipient": "worker_contributor",
+  "receipt_sha256": "09c6f4e024d9d8e99378eeb76b2e3d6b45300a2be37aa07e16970edef8e0d95c",
+  "checks": {
+    "android_capture_found": true,
+    "video_hash_verified": true,
+    "manifest_hash_verified": true,
+    "datapool_asset_found": true,
+    "asset_sent": true,
+    "worker_received": true,
+    "receipt_created": true,
+    "receipt_linked_to_capture": true
+  },
+  "result": "PASS"
+}
